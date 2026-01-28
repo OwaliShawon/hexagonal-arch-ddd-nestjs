@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApplicationBootstrapOptions } from '../common/interfaces/application-bootstrap-options.interface';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({})
 export class CoreModule {
@@ -13,13 +14,14 @@ export class CoreModule {
             TypeOrmModule.forRoot({
               type: 'postgres',
               host: 'localhost',
-              port: 5432,
-              password: '123456',
+              port: 5435,
+              password: 'pass123',
               username: 'postgres',
               database: 'alarms_db',
               autoLoadEntities: true,
               synchronize: true,
             }),
+            MongooseModule.forRoot('mongodb://localhost:27018/vf-read-db'),
           ]
         : [];
 

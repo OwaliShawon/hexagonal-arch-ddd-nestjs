@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  write-db:
+    image: postgres
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_PASSWORD: pass123
+      POSTGRES_USER: postgres
+      POSTGRES_DB: alarms_db
+  read-db:
+    image: mongo
+    ports:
+      - 27018:27017
+    environment:
+      - MONGODB_DATABASE=vf-read-db

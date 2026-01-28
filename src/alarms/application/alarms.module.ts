@@ -1,18 +1,32 @@
 import { DynamicModule, Module, Type } from '@nestjs/common';
-import { AlarmFactory } from '../domain/factories/alarm.factory';
 import { AlarmsController } from '../presenters/http/alarms.controller';
 import { AlarmsService } from './alarms.service';
+import { AlarmsCqrsModule } from './cqrs/alarms-cqrs.module';
 
-@Module({
-  controllers: [AlarmsController],
-  providers: [AlarmsService, AlarmFactory],
-})
+/**
+ * Alarms Module - Application Layer
+ *
+ * This module coordinates:
+ * - HTTP Controllers for API endpoints
+ * - Service layer using CQRS pattern
+ * - CQRS implementation for commands/queries/events
+ *
+ * Must be used with .withInfrastucture() to provide persistence implementations
+ */
+@Module({})
 export class AlarmsModule {
-  static withInfrastucture(infrastructureModule: Type | DynamicModule) {
-    // 👈 new static method
+  /**
+   * Registers the AlarmsModule with infrastructure persistence
+   * @param infrastructureModule The infrastructure module providing repository implementations
+   */
+  static withInfrastucture(
+    infrastructureModule: Type | DynamicModule,
+  ): DynamicModule {
     return {
       module: AlarmsModule,
-      imports: [infrastructureModule],
+      imports: [AlarmsCqrsModule.withInfrastructure(infrastructureModule)],
+      controllers: [AlarmsController],
+      providers: [AlarmsService],
     };
   }
 }

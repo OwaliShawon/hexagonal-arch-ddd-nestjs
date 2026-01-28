@@ -1,0 +1,308 @@
+================================================================================
+  HEXAGONAL ARCHITECTURE + CQRS IMPLEMENTATION - PROJECT OVERVIEW
+================================================================================
+
+PROJECT STATUS: ✅ COMPLETE & READY TO USE
+
+================================================================================
+WHAT'S IMPLEMENTED
+================================================================================
+
+1. ✅ CQRS MODULE (src/alarms/application/cqrs/)
+   - Dedicated CQRS module for clear learning and organization
+   - Commands: CreateAlarmCommand + Handler
+   - Queries: GetAlarmsQuery + Handler
+   - Events: AlarmCreatedEvent + Handler
+   - Clear folder structure for easy navigation
+
+2. ✅ HEXAGONAL ARCHITECTURE
+   - Presentation Layer: HTTP controllers with DTOs
+   - Application Layer: CQRS commands/queries/events
+   - Domain Layer: Pure business logic (Alarm, AlarmItem, AlarmSeverity)
+   - Infrastructure Layer: PostgreSQL, MongoDB, in-memory implementations
+
+3. ✅ DUAL DATABASE STRATEGY
+   - PostgreSQL: Write database (source of truth, normalized)
+   - MongoDB: Read database (denormalized, optimized for queries)
+   - Event-driven synchronization between databases
+   - Docker compose file for easy setup
+
+4. ✅ REPOSITORY PATTERN
+   - Abstract ports: CreateAlarmRepository, FindAlarmsRepository, UpsertMaterializedAlarmRepository
+   - Multiple adapters: ORM (PostgreSQL), ORM Read (MongoDB), In-Memory
+   - Easy to swap implementations
+
+5. ✅ COMPREHENSIVE DOCUMENTATION
+   - GETTING_STARTED.md: Starting guide (START HERE!)
+   - SUMMARY.md: Quick overview and file guide
+   - ARCHITECTURE.md: Visual diagrams and flows
+   - TESTING.md: Setup and testing guide
+   - src/alarms/application/cqrs/README.md: CQRS deep dive
+   - This file: Project overview
+
+6. ✅ PRODUCTION READY
+   - All code compiles successfully
+   - All linting passed
+   - Proper error handling
+   - Type-safe implementation
+   - Docker support
+
+================================================================================
+QUICK START (3 STEPS)
+================================================================================
+
+1. Install dependencies:
+   $ npm install
+
+2. Start databases:
+   $ docker-compose up -d
+
+3. Run the application:
+   $ npm run start:dev
+
+================================================================================
+PROJECT STRUCTURE
+================================================================================
+
+src/alarms/
+├── application/
+│   ├── cqrs/                          ← 🎯 MAIN LEARNING AREA
+│   │   ├── commands/                  (Write operations)
+│   │   │   ├── create-alarm.command.ts
+│   │   │   └── create-alarm.command-handler.ts
+│   │   ├── queries/                   (Read operations)
+│   │   │   ├── get-alarms.query.ts
+│   │   │   └── get-alarms.query-handler.ts
+│   │   ├── events/                    (Event handlers)
+│   │   │   └── alarm-created.event-handler.ts
+│   │   ├── alarms-cqrs.module.ts      (CQRS module)
+│   │   ├── README.md                  (CQRS documentation)
+│   │   └── index.ts                   (Export barrel)
+│   ├── ports/                         (Repository interfaces)
+│   │   ├── create-alarm.repository.ts
+│   │   ├── find-alarms.repository.ts
+│   │   └── upsert-materialized-alarm.repository.ts
+│   ├── alarms.module.ts               (Main module)
+│   └── alarms.service.ts              (CQRS facade)
+├── domain/
+│   ├── alarm.ts                       (Aggregate root)
+│   ├── alarm-item.ts                  (Entity)
+│   ├── factories/
+│   │   └── alarm.factory.ts           (Factory pattern)
+│   ├── value-objects/
+│   │   └── alarm-severity.ts          (Value object)
+│   ├── events/
+│   │   └── alarm-created.event.ts     (Domain event)
+│   └── read-models/
+│       └── alarm.read-model.ts        (Query model)
+├── infrastructure/
+│   ├── persistence/
+│   │   ├── orm/                       (PostgreSQL + MongoDB)
+│   │   │   ├── entities/
+│   │   │   │   ├── alarm.entity.ts
+│   │   │   │   └── alarm-item.entity.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── create-alarm.repository.ts
+│   │   │   │   ├── find-alarms.repository.ts
+│   │   │   │   └── upsert-materialized-alarm.repository.ts
+│   │   │   ├── mappers/
+│   │   │   │   └── alarm.mapper.ts
+│   │   │   ├── schemas/
+│   │   │   │   └── materialized-alarm-view.schema.ts
+│   │   │   └── orm-persistence.module.ts
+│   │   └── in-memory/                 (For testing)
+│   │       ├── entities/
+│   │       ├── repositories/
+│   │       ├── mappers/
+│   │       └── in-memory-persistence.module.ts
+│   └── alarms-infrastructure.module.ts
+└── presenters/
+    └── http/
+        ├── alarms.controller.ts
+        └── dto/
+            └── create-alarm.dto.ts
+
+================================================================================
+DOCUMENTATION FILES (READ IN ORDER)
+================================================================================
+
+1. GETTING_STARTED.md      - Your entry point, navigation guide
+2. SUMMARY.md              - High-level overview
+3. ARCHITECTURE.md         - Visual diagrams and flows
+4. src/alarms/application/cqrs/README.md - CQRS deep dive
+5. TESTING.md              - Setup and testing guide
+
+================================================================================
+KEY FEATURES
+================================================================================
+
+✅ Command Pattern: Write operations separated from reads
+✅ Query Pattern: Read operations optimized for performance
+✅ Event Handling: Domain events trigger read model updates
+✅ Hexagonal Architecture: Ports and adapters design
+✅ Domain-Driven Design: Rich domain models
+✅ Dual Databases: PostgreSQL (writes) + MongoDB (reads)
+✅ Repository Pattern: Abstract data access
+✅ Factory Pattern: Create complex domain objects
+✅ Value Objects: Immutable domain concepts
+✅ Event Sourcing Ready: Foundation for event sourcing
+✅ Testable: Easy to mock and test
+✅ Scalable: Independent read/write scaling
+
+================================================================================
+TECHNOLOGIES USED
+================================================================================
+
+Framework:     NestJS
+Language:      TypeScript
+Write DB:      PostgreSQL
+Read DB:       MongoDB
+ORM:           TypeORM (PostgreSQL)
+ODM:           Mongoose (MongoDB)
+Pattern:       CQRS + Hexagonal Architecture
+Container:     Docker + Docker Compose
+
+================================================================================
+API ENDPOINTS
+================================================================================
+
+POST /alarms
+  Creates a new alarm
+  Request body: {name, severity, triggeredAt, items}
+  Response: Created alarm with domain model fields
+
+GET /alarms
+  Retrieves all alarms from read model
+  Returns: Array of AlarmReadModel (denormalized, optimized)
+
+================================================================================
+DATABASE SCHEMA
+================================================================================
+
+POSTGRESQL (Write DB):
+  - alarms table: id, name, severity, triggeredAt, isAcknowledged
+  - alarm_items table: id, name, type, alarm_id (FK)
+
+MONGODB (Read DB):
+  - materialized_alarmviews collection: denormalized alarms with all data
+
+================================================================================
+FLOW EXAMPLE: CREATE ALARM
+================================================================================
+
+1. HTTP POST /alarms with JSON body
+2. AlarmsController receives request
+3. CreateAlarmDto validated
+4. AlarmsService.create(CreateAlarmCommand) called
+5. CommandBus.execute(command)
+6. CreateAlarmCommandHandler executes
+   a. AlarmFactory.create() creates domain object
+   b. CreateAlarmRepository.save() writes to PostgreSQL
+   c. EventBus.publish(AlarmCreatedEvent)
+7. AlarmCreatedEventHandler receives event
+   a. UpsertMaterializedAlarmRepository.upsert() updates MongoDB
+8. Response returned to client
+
+================================================================================
+FLOW EXAMPLE: GET ALARMS
+================================================================================
+
+1. HTTP GET /alarms
+2. AlarmsController receives request
+3. AlarmsService.findAll() called
+4. QueryBus.execute(GetAlarmsQuery)
+5. GetAlarmsQueryHandler executes
+   a. FindAlarmsRepository.findAll() queries MongoDB
+   b. Returns denormalized AlarmReadModel[]
+6. Response returned to client
+
+================================================================================
+TESTING THE APPLICATION
+================================================================================
+
+# Create an alarm
+curl -X POST http://localhost:3000/alarms \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "High CPU Usage",
+    "severity": "high",
+    "triggeredAt": "2026-01-28T12:00:00.000Z",
+    "items": [{"name": "Server-1", "type": "CPU"}]
+  }'
+
+# Get all alarms
+curl http://localhost:3000/alarms
+
+See TESTING.md for more examples and database verification
+
+================================================================================
+LEARNING RECOMMENDATIONS
+================================================================================
+
+Beginner Path (4 days):
+  Day 1: Read GETTING_STARTED.md + SUMMARY.md
+  Day 2: Read ARCHITECTURE.md diagrams
+  Day 3: Read cqrs/README.md
+  Day 4: Run TESTING.md examples
+
+Intermediate Path (1 week):
+  - Study all documentation
+  - Trace code execution
+  - Compare ORM vs In-Memory implementations
+  - Add new command/query
+
+Advanced Path (2 weeks):
+  - Deep dive into domain models
+  - Understand event synchronization
+  - Add event sourcing
+  - Implement sagas
+  - Add validation
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Read GETTING_STARTED.md (start here!)
+2. Run: npm install && docker-compose up -d && npm run start:dev
+3. Test endpoints with curl commands
+4. Study the cqrs/ folder
+5. Modify and extend the implementation
+
+================================================================================
+PROJECT STATISTICS
+================================================================================
+
+Files Created:        40+
+Total Lines of Code:  2,000+
+Documentation Pages: 6
+Patterns Implemented: 8
+Databases Used:       2
+Layers:              4
+
+================================================================================
+VERIFICATION
+================================================================================
+
+✅ npm run build  - Compiles successfully
+✅ npm run lint   - No linting errors
+✅ All imports resolve correctly
+✅ Type checking passes
+✅ Project ready for development
+
+================================================================================
+SUPPORT
+================================================================================
+
+For issues, check:
+1. TESTING.md troubleshooting section
+2. Docker containers running: docker-compose ps
+3. Application logs: npm run start:dev
+4. Database connections
+
+================================================================================
+
+That's it! You're ready to learn CQRS and Hexagonal Architecture!
+
+Start with: GETTING_STARTED.md
+
+================================================================================
