@@ -1,16 +1,37 @@
 version: "3.8"
 services:
   write-db:
-    image: postgres
+    image: postgres:16-alpine
+    container_name: hexagonal_write_db
     ports:
       - "5435:5432"
     environment:
       POSTGRES_PASSWORD: pass123
       POSTGRES_USER: postgres
       POSTGRES_DB: alarms_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - write_db_data:/var/lib/postgresql/data
+
   read-db:
-    image: mongo
+    image: mongo:7.0
+    container_name: hexagonal_read_db
     ports:
-      - 27018:27017
+      - "27035:27017"
     environment:
-      - MONGODB_DATABASE=vf-read-db
+      MONGO_INITDB_DATABASE: alarms_read_db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - read_db_data:/data/db
+
+volumes:
+  write_db_data:
+  read_db_data:
