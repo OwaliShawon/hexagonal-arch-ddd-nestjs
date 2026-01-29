@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: pass123
       POSTGRES_USER: postgres
-      POSTGRES_DB: alarms_db
+      POSTGRES_DB: alarms_write_db, alarms_read_db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

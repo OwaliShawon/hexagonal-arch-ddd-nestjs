@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AlarmsService } from '../../application/alarms.service';
 import { CreateAlarmCommand } from '../../application/cqrs/commands/create-alarm.command';
 
 @Injectable()
 export class AlarmsCli {
+  private readonly logger = new Logger(AlarmsCli.name);
+
   constructor(private readonly alarmsService: AlarmsService) {}
 
   /**
@@ -25,7 +27,7 @@ export class AlarmsCli {
       new CreateAlarmCommand(args.name, args.severity, triggeredAt, items),
     );
 
-    console.log('Alarm created:', result);
+    this.logger.log('Alarm created:', result);
     return result;
   }
 
@@ -35,7 +37,7 @@ export class AlarmsCli {
    */
   async listAlarms() {
     const alarms = await this.alarmsService.findAll();
-    console.log('Alarms:', JSON.stringify(alarms, null, 2));
+    this.logger.log('Alarms:', JSON.stringify(alarms, null, 2));
     return alarms;
   }
 }

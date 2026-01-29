@@ -9,7 +9,7 @@ import { AlarmMapper } from '../mappers/alarm.mapper';
 @Injectable()
 export class OrmCreateAlarmRepository implements CreateAlarmRepository {
   constructor(
-    @InjectRepository(AlarmEntity)
+    @InjectRepository(AlarmEntity, 'alarms_write_db')
     private readonly alarmRepository: Repository<AlarmEntity>,
   ) {}
 

@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { AlarmFactory } from '../../domain/factories/alarm.factory';
 import { CreateAlarmCommandHandler } from './commands/create-alarm.command-handler';
 import { GetAlarmsQueryHandler } from './queries/get-alarms.query-handler';
+import { GetAlarmsPgQueryHandler } from './queries/get-alarms-pg.query-handler';
 import { AlarmCreatedEventHandler } from './events/alarm-created.event-handler';
 
 /**
@@ -27,6 +28,7 @@ import { AlarmCreatedEventHandler } from './events/alarm-created.event-handler';
 
     // Query Handlers (Read operations)
     GetAlarmsQueryHandler,
+    GetAlarmsPgQueryHandler,
 
     // Event Handlers (Side effects)
     AlarmCreatedEventHandler,
@@ -49,6 +51,7 @@ export class AlarmsCqrsModule {
         AlarmFactory,
         CreateAlarmCommandHandler,
         GetAlarmsQueryHandler,
+        GetAlarmsPgQueryHandler,
         AlarmCreatedEventHandler,
       ],
       exports: [AlarmFactory],

@@ -23,4 +23,9 @@ export class AlarmsController {
   findAll() {
     return this.alarmsService.findAll();
   }
+
+  @Get('pg')
+  findAllPg() {
+    return this.alarmsService.findAllPg();
+  }
 }
