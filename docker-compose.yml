@@ -1,5 +1,29 @@
 version: "3.8"
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hexagonal_api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - WRITE_DB_HOST=write-db
+      - WRITE_DB_PORT=5432
+      - WRITE_DB_USER=postgres
+      - WRITE_DB_PASSWORD=pass123
+      - WRITE_DB_NAME=alarms_write_db
+      - READ_DB_HOST=read-db
+      - READ_DB_PORT=27017
+      - READ_DB_NAME=alarms_read_db
+    depends_on:
+      write-db:
+        condition: service_healthy
+      read-db:
+        condition: service_healthy
+    networks:
+      - monitoring
   write-db:
     image: postgres:16-alpine
     container_name: hexagonal_write_db
@@ -10,7 +34,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: alarms_write_db, alarms_read_db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,13 +49,68 @@ services:
     environment:
       MONGO_INITDB_DATABASE: alarms_read_db
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - read_db_data:/data/db
 
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: hexagonal_loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+      - loki_data:/tmp/loki
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    container_name: hexagonal_prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: hexagonal_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge
+
 volumes:
   write_db_data:
   read_db_data:
+  loki_data:
+  prometheus_data:
+  grafana_data:
